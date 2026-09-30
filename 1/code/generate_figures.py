@@ -432,7 +432,7 @@ def fig_golden(x0=-8.0, y0=0.0, a=-12.0, b=4.0):
     ax1.set_ylabel("iteration")
     ax1.set_ylim(nplot - 0.8, -0.8)
     ax1.set_yticks(np.arange(0, nplot, 2))
-    ax1.set_title("Probe points $x_1,x_2$ inside the current interval $[a,b]$", fontsize=12)
+    ax1.set_title("Probe points $u,v$ inside the current interval $[a,b]$", fontsize=12)
     fig.tight_layout()
     save(fig, "p1_golden.png")
     return hist, d, xstar
@@ -473,7 +473,7 @@ def fig_nonpoly():
     cases = [
         ("exponential", r"$y=e^{x}$", lambda x: np.exp(x), lambda x: np.exp(x), lambda x: np.exp(x), (0.0, 2.0), -1.0, (-3, 2)),
         ("logarithm", r"$y=\ln x$", lambda x: np.log(x), lambda x: 1.0 / x, lambda x: -1.0 / x**2, (3.0, 0.0), 2.0, (0.2, 6)),
-        ("denominator", r"$y=1/x$", lambda x: 1.0 / x, lambda x: -1.0 / x**2, lambda x: 2.0 / x**3, (2.0, 2.0), 1.2, (0.3, 4)),
+        ("denominator", r"$y=\frac{1}{x}$", lambda x: 1.0 / x, lambda x: -1.0 / x**2, lambda x: 2.0 / x**3, (2.0, 2.0), 1.2, (0.3, 4)),
         ("radical", r"$y=\sqrt{x}$", lambda x: np.sqrt(x), lambda x: 0.5 / np.sqrt(x), lambda x: -0.25 / x**1.5, (2.0, 3.0), 2.5, (0.05, 6)),
     ]
     fig, axes = plt.subplots(2, 2, figsize=(9.2, 7.6))
@@ -519,13 +519,30 @@ def fig_other_parabolas():
     for ax, ((a, b, c), (x0, y0), lab) in zip(axes, samples):
         out = distance_to_parabola(x0, y0, a, b, c, initial_guess=x0, interval=(-8, 8))
         d, xstar, _ = out["newton"]
-        xs = np.linspace(-6, 6, 300)
-        ax.plot(xs, a * xs**2 + b * xs + c, color=TEAL, lw=2.0, label=lab)
-        ax.scatter([x0], [y0], color=TERRACOTTA, s=40)
-        ax.scatter([xstar], [a * xstar**2 + b * xstar + c], color=GOLD, s=36)
-        ax.plot([x0, xstar], [y0, a * xstar**2 + b * xstar + c], color=TERRACOTTA, ls="--", lw=1.3)
+        ystar = a * xstar**2 + b * xstar + c
+        margin = max(1.0, 0.35 * abs(x0 - xstar))
+        x_min = min(x0, xstar) - margin
+        x_max = max(x0, xstar) + margin
+        xs = np.linspace(x_min, x_max, 300)
+        ys = a * xs**2 + b * xs + c
+        x_center = 0.5 * (x_min + x_max)
+        y_min = min(y0, ystar, float(np.min(ys)))
+        y_max = max(y0, ystar, float(np.max(ys)))
+        y_center = 0.5 * (y_min + y_max)
+        view_size = 1.25 * max(x_max - x_min, y_max - y_min)
+        view_x_min = x_center - view_size / 2
+        view_x_max = x_center + view_size / 2
+        curve_xs = np.linspace(view_x_min, view_x_max, 600)
+
+        ax.plot(curve_xs, a * curve_xs**2 + b * curve_xs + c, color=TEAL, lw=2.0, label=lab)
+        ax.scatter([x0], [y0], color=TERRACOTTA, s=40, zorder=5)
+        ax.scatter([xstar], [ystar], color=GOLD, s=36, zorder=5)
+        ax.plot([x0, xstar], [y0, ystar], color=TERRACOTTA, ls="--", lw=1.3)
         ax.set_title(f"d={d:.4f}")
-        ax.legend(frameon=False, fontsize=8)
+        ax.legend(frameon=False, fontsize=7, loc="best")
+        ax.set_xlim(view_x_min, view_x_max)
+        ax.set_ylim(y_center - view_size / 2, y_center + view_size / 2)
+        ax.set_aspect("equal", adjustable="box")
         recs.append({"eq": lab, "point": (x0, y0), "d": d, "x": xstar})
     fig.suptitle("General parabola routine on other $(a,b,c)$ and query points", y=1.03)
     fig.tight_layout()
