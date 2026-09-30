@@ -10,21 +10,26 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.collections import LineCollection
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import FancyArrowPatch
 
 ROOT = Path(__file__).resolve().parents[1]
 MEDIA = ROOT / "media"
 MEDIA.mkdir(parents=True, exist_ok=True)
 
-INK = "#1C1917"
-PAPER = "#FBF7F0"
-GRID = "#E8E0D4"
-TERRACOTTA = "#C2410C"
-TEAL = "#0F766E"
-GOLD = "#B45309"
-SLATE = "#57534E"
-CLAY = "#9A3412"
-NAVY = "#1E3A5F"
+INK = "#211A16"
+PAPER = "#F6F0E7"
+GRID = "#D7CABA"
+TERRACOTTA = "#94563B"
+BROWN = "#6F5239"
+GOLD = "#AD843C"
+SLATE = "#49443F"
+CLAY = "#784632"
+NAVY = "#273D56"
+FALL_OLIVE = "#59634B"
+FALL_CMAP = LinearSegmentedColormap.from_list(
+    "fall", [GOLD, TERRACOTTA, BROWN, NAVY]
+)
 
 plt.rcParams.update(
     {
@@ -261,8 +266,8 @@ def annotate_point(ax, x, y, text, color=INK, offset=(8, 8)):
 def fig_overview(results):
     fig, ax = plt.subplots(figsize=(8.6, 6.3))
     xs = np.linspace(-10, 8, 500)
-    ax.plot(xs, xs**2 + 5, color=TEAL, lw=2.6, label=r"$y = x^2 + 5$")
-    colors = [TERRACOTTA, GOLD, NAVY, CLAY, "#7C3AED"]
+    ax.plot(xs, xs**2 + 5, color=BROWN, lw=2.6, label=r"$y = x^2 + 5$")
+    colors = [TERRACOTTA, GOLD, NAVY, CLAY, FALL_OLIVE]
     for (x0, y0), rec, col in zip(QUERY_POINTS, results, colors):
         xstar = rec["x_analytic"]
         ystar = xstar**2 + 5
@@ -302,7 +307,7 @@ def fig_orthogonality():
     ystar = xstar**2 + 5
     fig, ax = plt.subplots(figsize=(8.2, 6.0))
     xs = np.linspace(-10, 2, 400)
-    ax.plot(xs, xs**2 + 5, color=TEAL, lw=2.4, label=r"$f(x)=x^2+5$")
+    ax.plot(xs, xs**2 + 5, color=BROWN, lw=2.4, label=r"$f(x)=x^2+5$")
     ax.scatter([x0], [y0], s=70, color=TERRACOTTA, zorder=5, label="query $(-8,0)$")
     ax.scatter([xstar], [ystar], s=70, color=GOLD, zorder=5, label="closest point")
     ax.plot([x0, xstar], [y0, ystar], color=TERRACOTTA, lw=1.8)
@@ -343,7 +348,7 @@ def fig_newton_geometry(x0=-8.0, y0=0.0, guess=-2.5):
     d, xstar, hist = find_distance_newton(x0, y0, f, df, ddf, initial_guess=guess)
     fig, ax = plt.subplots(figsize=(8.2, 6.0))
     xs = np.linspace(-10, 2, 400)
-    ax.plot(xs, f(xs), color=TEAL, lw=2.4, label=r"$y=x^2+5$")
+    ax.plot(xs, f(xs), color=BROWN, lw=2.4, label=r"$y=x^2+5$")
     ax.scatter([x0], [y0], s=70, color=TERRACOTTA, zorder=6, label="query")
     for i, x in enumerate(hist[:8]):
         if i > 5:
@@ -378,7 +383,7 @@ def fig_newton_dprime(x0=-8.0, y0=0.0, guess=-2.5, hist=None):
     xs = np.linspace(-5.2, 1.2, 500)
     fig, ax = plt.subplots(figsize=(8.2, 5.4))
     ax.axhline(0, color=SLATE, lw=0.9)
-    ax.plot(xs, [Dp(x) for x in xs], color=TEAL, lw=2.2, label=r"$D'(x)$")
+    ax.plot(xs, [Dp(x) for x in xs], color=BROWN, lw=2.2, label=r"$D'(x)$")
     nshow = min(6, len(hist) - 1)
     for i in range(nshow):
         x = hist[i]
@@ -412,7 +417,7 @@ def fig_golden(x0=-8.0, y0=0.0, a=-12.0, b=4.0):
     fig, (ax0, ax1) = plt.subplots(
         2, 1, figsize=(8.2, 7.0), sharex=True, gridspec_kw={"height_ratios": [1.35, 1.0]}
     )
-    ax0.plot(xs, Dvals, color=TEAL, lw=2.2, label=r"$D(x)=(x+8)^2+(x^2+5)^2$")
+    ax0.plot(xs, Dvals, color=BROWN, lw=2.2, label=r"$D(x)=(x+8)^2+(x^2+5)^2$")
     ax0.axvline(xstar, color=TERRACOTTA, ls="--", lw=1.2, label=f"minimizer $x^*={xstar:.4f}$")
     ax0.scatter([xstar], [dist_sq(xstar, x0, y0, f)], color=TERRACOTTA, s=40, zorder=5)
     ax0.set_ylim(70, 220)
@@ -420,7 +425,7 @@ def fig_golden(x0=-8.0, y0=0.0, a=-12.0, b=4.0):
     ax0.set_title("Golden-section search: objective and shrinking bracket")
     ax0.legend(frameon=False, loc="upper right")
 
-    cmap = plt.cm.Oranges
+    cmap = FALL_CMAP
     nplot = min(18, len(hist))
     for i in range(nplot):
         lo, hi, x1, x2 = hist[i]
@@ -461,10 +466,10 @@ def fig_all_points_table_plot(results):
     for (r, c), cell in table.get_celld().items():
         cell.set_edgecolor(GRID)
         if r == 0:
-            cell.set_facecolor(TEAL)
+            cell.set_facecolor(BROWN)
             cell.set_text_props(color="white", fontfamily="DejaVu Sans")
         else:
-            cell.set_facecolor(PAPER if r % 2 else "#F3EDE3")
+            cell.set_facecolor(PAPER if r % 2 else "#EBE1D5")
     ax.set_title("Agreement of analytic, Newton, and golden-section distances", pad=18)
     save(fig, "p1_table.png")
 
@@ -483,7 +488,7 @@ def fig_nonpoly():
         dN, xN, hist = find_distance_newton(x0, y0, f, df, ddf, initial_guess=guess)
         dG, xG, _ = golden_section_search(x0, y0, f, lo, hi)
         xs = np.linspace(lo, hi, 400)
-        ax.plot(xs, f(xs), color=TEAL, lw=2.1, label=label)
+        ax.plot(xs, f(xs), color=BROWN, lw=2.1, label=label)
         ax.scatter([x0], [y0], color=TERRACOTTA, s=50, zorder=5, label="query")
         ax.scatter([xN], [f(xN)], color=GOLD, s=40, zorder=5)
         ax.plot([x0, xN], [y0, f(xN)], color=TERRACOTTA, lw=1.5, ls="--")
@@ -534,9 +539,9 @@ def fig_other_parabolas():
         view_x_max = x_center + view_size / 2
         curve_xs = np.linspace(view_x_min, view_x_max, 600)
 
-        ax.plot(curve_xs, a * curve_xs**2 + b * curve_xs + c, color=TEAL, lw=2.0, label=lab)
-        ax.scatter([x0], [y0], color=TERRACOTTA, s=40, zorder=5)
-        ax.scatter([xstar], [ystar], color=GOLD, s=36, zorder=5)
+        ax.plot(curve_xs, a * curve_xs**2 + b * curve_xs + c, color=BROWN, lw=2.0, label=lab)
+        ax.scatter([x0], [y0], color=TERRACOTTA, marker="o", s=40, zorder=5)
+        ax.scatter([xstar], [ystar], color=GOLD, marker="s", s=36, zorder=5)
         ax.plot([x0, xstar], [y0, ystar], color=TERRACOTTA, ls="--", lw=1.3)
         ax.set_title(f"d={d:.4f}")
         ax.legend(frameon=False, fontsize=7, loc="best")
@@ -558,7 +563,7 @@ def fig_newton_nonpoly_exp():
     d, xstar, hist = find_distance_newton(x0, y0, f, df, ddf, initial_guess=-1.0)
     fig, ax = plt.subplots(figsize=(8.0, 5.2))
     xs = np.linspace(-3, 2, 400)
-    ax.plot(xs, np.exp(xs), color=TEAL, lw=2.3, label=r"$y=e^x$")
+    ax.plot(xs, np.exp(xs), color=BROWN, lw=2.3, label=r"$y=e^x$")
     ax.scatter([x0], [y0], color=TERRACOTTA, s=60, zorder=5, label="(0, 2)")
     for i, x in enumerate(hist[:8]):
         ax.scatter([x], [np.exp(x)], color=GOLD, s=28, zorder=5)
@@ -582,7 +587,7 @@ def fig_fits(m, b, a, bb, c):
     for x, y in POINTS:
         ax.annotate(f"({x:g},{y:g})", (x, y), textcoords="offset points", xytext=(6, 6), fontsize=8, fontfamily="DejaVu Sans")
     ax.plot(xr, m * xr + b, color=TERRACOTTA, lw=2.2, label=fr"line  $y={m:.3f}x{b:+.3f}$")
-    ax.plot(xr, a * xr**2 + bb * xr + c, color=TEAL, lw=2.2, label=fr"parabola  $y={a:.3f}x^2{bb:+.3f}x{c:+.3f}$")
+    ax.plot(xr, a * xr**2 + bb * xr + c, color=BROWN, lw=2.2, label=fr"parabola  $y={a:.3f}x^2{bb:+.3f}x{c:+.3f}$")
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title("Least-squares line and parabola")
@@ -597,7 +602,7 @@ def fig_line_contour(hist):
     M, B = np.meshgrid(ms, bs)
     Z = np.mean((YS[None, None, :] - M[..., None] * XS - B[..., None]) ** 2, axis=2)
     fig, ax = plt.subplots(figsize=(7.4, 6.0))
-    cs = ax.contour(M, B, Z, levels=18, colors=TEAL, linewidths=0.9)
+    cs = ax.contour(M, B, Z, levels=18, colors=BROWN, linewidths=0.9)
     ax.clabel(cs, fmt="%.2f", fontsize=7)
     path = np.array([[h[0], h[1]] for h in hist[:30]])
     ax.plot(path[:, 0], path[:, 1], color=TERRACOTTA, lw=1.6, marker="o", ms=5, label="coordinate Newton")
@@ -616,7 +621,7 @@ def fig_line_intermediates(hist):
     xr = np.linspace(-0.3, 3.3, 100)
     ax.scatter(XS, YS, s=64, color=INK, zorder=5, label="data")
     picks = [0, 1, 2, 3, 4]
-    cmap = plt.cm.Oranges
+    cmap = FALL_CMAP
     for k, i in enumerate(picks):
         if i >= len(hist):
             continue
@@ -634,7 +639,7 @@ def fig_parabola_intermediates(hist):
     xr = np.linspace(-0.3, 3.3, 120)
     ax.scatter(XS, YS, s=64, color=INK, zorder=5, label="data")
     picks = [0, 1, 3, 9, 21, 60]
-    cmap = plt.cm.YlGnBu
+    cmap = FALL_CMAP
     for k, i in enumerate(picks):
         if i >= len(hist):
             continue
@@ -656,7 +661,7 @@ def fig_parabola_intermediates(hist):
 def fig_mse_history(line_hist, para_hist):
     fig, ax = plt.subplots(figsize=(7.8, 4.6))
     ax.semilogy([h[2] for h in line_hist], color=TERRACOTTA, marker="o", lw=1.6, label="line MSE")
-    ax.semilogy([h[3] for h in para_hist], color=TEAL, marker="s", lw=1.6, label="parabola MSE")
+    ax.semilogy([h[3] for h in para_hist], color=BROWN, marker="s", lw=1.6, label="parabola MSE")
     ax.set_xlabel("coordinate-Newton step")
     ax.set_ylabel("MSE")
     ax.set_title("MSE vs. iteration (alternating one-parameter Newton)")
@@ -672,7 +677,7 @@ def fig_residuals(m, b, a, bb, c):
     axes[0].stem(XS, YS - yhat_l, linefmt=TERRACOTTA, markerfmt="o", basefmt="none")
     axes[0].set_title(f"line residuals  MSE={mse_line(m,b):.4f}")
     axes[1].axhline(0, color=SLATE, lw=0.8)
-    axes[1].stem(XS, YS - yhat_p, linefmt=TEAL, markerfmt="s", basefmt="none")
+    axes[1].stem(XS, YS - yhat_p, linefmt=BROWN, markerfmt="s", basefmt="none")
     axes[1].set_title(f"parabola residuals  MSE={mse_parabola(a,bb,c):.4f}")
     for ax in axes:
         ax.set_xlabel("x")
