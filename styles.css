@@ -1,0 +1,118 @@
+:root {
+  --paper: #f7f3ec;
+  --ink: #2b241f;
+  --muted: #665b52;
+  --rule: #d8cec1;
+  --accent: #76523b;
+  --accent-light: #a88468;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Figtree", system-ui, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.wrap {
+  width: min(1080px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 22px 0 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.mark {
+  font-family: "Figtree", system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.mark span { color: var(--accent); }
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  margin-left: 18px;
+  font-size: 0.95rem;
+}
+
+.nav a:hover { color: var(--accent); }
+
+.hero {
+  padding: 72px 0 56px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Figtree", system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  margin: 10px 0 16px;
+  max-width: 14ch;
+}
+
+.lede {
+  max-width: 46ch;
+  font-size: 1.15rem;
+  color: var(--muted);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 32px 0 80px;
+}
+
+.card {
+  border-top: 2px solid var(--accent-light);
+  padding: 18px 0 20px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.card:hover { color: var(--accent); }
+
+.card .num {
+  font-family: "Figtree", system-ui, sans-serif;
+  color: var(--accent);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+}
+
+.card h2 { margin: 8px 0 6px; font-size: 1.7rem; }
+
+.card p { max-width: 60ch; margin: 0; color: var(--muted); }
+
+.footer {
+  border-top: 1px solid var(--rule);
+  padding: 24px 0 40px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
