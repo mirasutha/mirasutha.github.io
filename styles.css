@@ -54,7 +54,6 @@ body {
 
 .hero {
   padding: 72px 0 56px;
-  border-bottom: 1px solid var(--rule);
 }
 
 .kicker {
