@@ -1,3 +1,10 @@
+.pdf-viewer {
+  display: block;
+  width: 100%;
+  height: 800px;
+  border: 1px solid var(--rule);
+  background: white;
+}
 :root {
   --paper: #f7f3ec;
   --ink: #2b241f;
@@ -268,6 +275,7 @@ h3[id] { color: var(--accent); }
   .grid-2 { grid-template-columns: 1fr; }
   figure { width: 100%; }
   .fit-summary { width: 100%; }
+    .pdf-viewer { height: 70vh; min-height: 520px; }
   nav a { margin-left: 10px; }
 }
 

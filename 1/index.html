@@ -413,7 +413,46 @@
       </figure>
 
       <h3 id="part2-coord">2.2 Coordinate-Wise Newton–Raphson Method</h3>
-      <p>Alternating single-parameter updates: $\theta_{k+1} = \theta_k - \frac{\partial \mathrm{MSE} / \partial \theta}{\partial^2 \mathrm{MSE} / \partial \theta^2}$.</p>
+      <p>Coordinate-wise Newton–Raphson optimizes a multi-variable loss function by sequentially updating one coordinate parameter at a time while holding all others fixed. For a parameter $\theta$, the exact 1D Newton update step is given by:</p>
+      $$\theta_{k+1} = \theta_k - \frac{\frac{\partial \mathrm{MSE}}{\partial \theta}}{\frac{\partial^2 \mathrm{MSE}}{\partial \theta^2}}$$
+
+      <h4>2.2.1 Linear Model Derivation & Step-by-Step Solving ($y = mx + b$)</h4>
+      <p><strong>Partial Derivatives & Newton Steps:</strong></p>
+      <p>Expanding $\mathrm{MSE}(m,b) = \frac{1}{4}\sum_{i=1}^4 (y_i - mx_i - b)^2$ with respect to each parameter yields:</p>
+      $$\begin{aligned}
+      \frac{\partial \mathrm{MSE}}{\partial m} &= \frac{1}{2}\sum_{i=1}^4 (mx_i + b - y_i)x_i = \frac{1}{2}\left( m\sum x_i^2 + b\sum x_i - \sum x_i y_i \right) = \frac{1}{2}(14m + 6b - 31) \\
+      \frac{\partial^2 \mathrm{MSE}}{\partial m^2} &= \frac{1}{2}\sum x_i^2 = \frac{14}{2} = 7 \\
+      \frac{\partial \mathrm{MSE}}{\partial b} &= \frac{1}{2}\sum_{i=1}^4 (mx_i + b - y_i) = \frac{1}{2}\left( m\sum x_i + 4b - \sum y_i \right) = \frac{1}{2}(6m + 4b - 13) \\
+      \frac{\partial^2 \mathrm{MSE}}{\partial b^2} &= \frac{4}{2} = 2
+      \end{aligned}$$
+
+      <p><strong>Step-by-Step Execution starting at $(m_0, b_0) = (0.0, 0.0)$:</strong></p>
+      <ol class="steps">
+        <li><strong>Initial State ($k=0$):</strong> $m_0 = 0.0$, $b_0 = 0.0$.
+          <br />$$\mathrm{MSE}(0, 0) = \frac{1}{4}\left((0.5)^2 + (1.5)^2 + (3.5)^2 + (7.5)^2\right) = \frac{0.25 + 2.25 + 12.25 + 56.25}{4} = \mathbf{17.750000}$$
+        </li>
+        <li><strong>Step 1: Update $m$ (holding $b=0.0$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial m} = \frac{1}{2}(14(0) + 6(0) - 31) = -15.5, \qquad \frac{\partial^2 \mathrm{MSE}}{\partial m^2} = 7$$
+          $$m_1 = 0.0 - \frac{-15.5}{7} = \frac{31}{14} \approx \mathbf{2.214286}$$
+          $$\mathrm{MSE}(2.214286, 0.0) = \frac{1}{4}\sum (y_i - 2.214286 x_i)^2 = \mathbf{0.589286}$$
+        </li>
+        <li><strong>Step 2: Update $b$ (holding $m=2.214286$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial b} = \frac{1}{2}\left(6(2.214286) + 4(0) - 13\right) = \frac{1}{2}(13.285714 - 13) = 0.142857, \qquad \frac{\partial^2 \mathrm{MSE}}{\partial b^2} = 2$$
+          $$b_1 = 0.0 - \frac{0.142857}{2} = \mathbf{-0.071429}$$
+          $$\mathrm{MSE}(2.214286, -0.071429) = \mathbf{0.584184}$$
+        </li>
+        <li><strong>Step 3: Update $m$ (holding $b=-0.071429$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial m} = \frac{1}{2}\left(14(2.214286) + 6(-0.071429) - 31\right) = \frac{1}{2}(31 - 0.428574 - 31) = -0.214287$$
+          $$m_2 = 2.214286 - \frac{-0.214287}{7} = \mathbf{2.244898}$$
+          $$\mathrm{MSE}(2.244898, -0.071429) = \mathbf{0.580904}$$
+        </li>
+        <li><strong>Step 4: Update $b$ (holding $m=2.244898$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial b} = \frac{1}{2}\left(6(2.244898) + 4(-0.071429) - 13\right) = 0.092172$$
+          $$b_2 = -0.071429 - \frac{0.092172}{2} = \mathbf{-0.117347}$$
+          $$\mathrm{MSE}(2.244898, -0.117347) = \mathbf{0.578795}$$
+        </li>
+        <li><strong>Convergence:</strong> Successive updates continue alternating $m \to b \to m \to b$, asymptotically reaching the exact minimum $(m^\star, b^\star) = (\mathbf{2.300000}, \mathbf{-0.200000})$ with $\mathrm{MSE} = \mathbf{0.575000}$.</li>
+      </ol>
 
       <div class="grid-2 graph-pair">
         <figure>
@@ -425,13 +464,6 @@
           <figcaption>Figure 9. Progressive convergence of fitted line per coordinate step.</figcaption>
         </figure>
       </div>
-
-      <p><strong>Linear Optimization Steps (Initial Start $m_0=0, b_0=0$):</strong></p>
-      <ol class="steps">
-        <li>Step 1 (Update $m$): $\frac{\partial \text{MSE}}{\partial m} = -15.5, \; \frac{\partial^2 \text{MSE}}{\partial m^2} = 7 \implies m_1 = 0 - \frac{-15.5}{7} = 2.214286 \quad (\text{MSE} = 0.589286)$</li>
-        <li>Step 2 (Update $b$): $\frac{\partial \text{MSE}}{\partial b} = 0.142857, \; \frac{\partial^2 \text{MSE}}{\partial b^2} = 2 \implies b_1 = 0 - \frac{0.142857}{2} = -0.071429 \quad (\text{MSE} = 0.584184)$</li>
-        <li>Subsequent iterations alternate $m \to b$ converging to $(2.3, -0.2)$.</li>
-      </ol>
 
       <div class="table-scroll">
         <table>
@@ -448,6 +480,41 @@
           </tbody>
         </table>
       </div>
+
+      <h4>2.2.2 Parabolic Model Derivation & Step-by-Step Solving ($y = ax^2 + bx + c$)</h4>
+      <p><strong>Partial Derivatives & Second Derivatives:</strong></p>
+      <p>Expanding $\mathrm{MSE}(a,b,c) = \frac{1}{4}\sum_{i=1}^4 (ax_i^2 + bx_i + c - y_i)^2$ gives:</p>
+      $$\begin{aligned}
+      \frac{\partial \mathrm{MSE}}{\partial a} &= \frac{1}{2}(98a + 36b + 14c - 83), \qquad &\frac{\partial^2 \mathrm{MSE}}{\partial a^2} = \frac{98}{2} = 49 \\
+      \frac{\partial \mathrm{MSE}}{\partial b} &= \frac{1}{2}(36a + 14b + 6c - 31), \qquad &\frac{\partial^2 \mathrm{MSE}}{\partial b^2} = \frac{14}{2} = 7 \\
+      \frac{\partial \mathrm{MSE}}{\partial c} &= \frac{1}{2}(14a + 6b + 4c - 13), \qquad &\frac{\partial^2 \mathrm{MSE}}{\partial c^2} = \frac{4}{2} = 2
+      \end{aligned}$$
+
+      <p><strong>Step-by-Step Execution starting at $(a_0, b_0, c_0) = (0.0, 0.0, 0.0)$:</strong></p>
+      <ol class="steps">
+        <li><strong>Initial State ($k=0$):</strong> $a_0 = 0.0, b_0 = 0.0, c_0 = 0.0$.
+          <br />$$\mathrm{MSE}(0,0,0) = \mathbf{17.750000}$$
+        </li>
+        <li><strong>Step 1: Update $a$ (holding $b=0, c=0$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial a} = \frac{1}{2}(-83) = -41.5, \qquad \frac{\partial^2 \mathrm{MSE}}{\partial a^2} = 49$$
+          $$a_1 = 0.0 - \frac{-41.5}{49} = \frac{83}{98} \approx \mathbf{0.846939}$$
+          $$\mathrm{MSE}(0.846939, 0, 0) = \mathbf{0.201531}$$
+        </li>
+        <li><strong>Step 2: Update $b$ (holding $a=0.846939, c=0$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial b} = \frac{1}{2}\left(36(0.846939) + 0 - 31\right) = -0.244898, \qquad \frac{\partial^2 \mathrm{MSE}}{\partial b^2} = 7$$
+          $$b_1 = 0.0 - \frac{-0.244898}{7} \approx \mathbf{0.034985}$$
+          $$\mathrm{MSE}(0.846939, 0.034985, 0) = \mathbf{0.192960}$$
+        </li>
+        <li><strong>Step 3: Update $c$ (holding $a=0.846939, b=0.034985$ fixed):</strong>
+          <br />$$\frac{\partial \mathrm{MSE}}{\partial c} = \frac{1}{2}\left(14(0.846939) + 6(0.034985) - 13\right) = -0.466472, \qquad \frac{\partial^2 \mathrm{MSE}}{\partial c^2} = 2$$
+          $$c_1 = 0.0 - \frac{-0.466472}{2} \approx \mathbf{0.233236}$$
+          $$\mathrm{MSE}(0.846939, 0.034985, 0.233236) = \mathbf{0.084102}$$
+        </li>
+        <li><strong>Subsequent Cycle Iterations:</strong> Repeating $a \to b \to c$ updates reduces MSE rapidly:
+          <br />Cycle 2 yields $a_2 = 0.781845, b_2 = 0.039644, c_2 = 0.443096$ with $\mathrm{MSE} = \mathbf{0.021028}$.
+          <br />Full convergence leads to $(a^\star, b^\star, c^\star) = (\mathbf{0.750000}, \mathbf{0.050000}, \mathbf{0.550000})$ with minimum $\mathrm{MSE} = \mathbf{0.012500}$.
+        </li>
+      </ol>
 
       <div class="grid-2 graph-pair">
         <figure>
@@ -475,6 +542,11 @@
         <li><a href="./code/fitting.py">fitting.py</a> — Analytical linear system solvers and coordinate-wise Newton optimizer for MSE.</li>
         <li><a href="./code/generate_figures.py">generate_figures.py</a> — Plotting script generating step visualizations.</li>
       </ul>
+      <section class="handwritten-work">
+        <h2>Handwritten Work</h2>
+        <p><a href="./A1_handwritten.pdf" target="_blank" rel="noopener">Open the handwritten solutions PDF</a></p>
+        <iframe class="pdf-viewer" src="./A1_handwritten.pdf" title="Handwritten Assignment 1 solutions"></iframe>
+      </section>
     </main>
 
     <footer>
