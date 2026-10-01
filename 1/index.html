@@ -3,622 +3,482 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SYDE 572 · Assignment 1 · Mira Suthakar</title>
+  <title>SYDE 572 · Assignment 1 Solutions · Mira Suthakar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
   <link rel="stylesheet" href="./styles.css" />
+  <style>
+    details {
+      margin: 10px 0;
+      padding: 10px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+    summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: #2b2b2b;
+    }
+    details[open] summary {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+    }
+  </style>
 </head>
 <body>
   <div class="wrap">
     <header class="top">
       <a class="brand" href="../">mira<span>sutha</span></a>
       <nav>
-        <a href="./" aria-current="page">Assignment 1</a>
+        <a href="./" aria-current="page">Assignment 1 Solutions</a>
         <a href="#" onclick="window.print(); return false;">Print PDF</a>
       </nav>
     </header>
 
-    <h1 class="page-title">Assignment 1</h1>
+    <h1 class="page-title">SYDE 572: Assignment 1 Solutions</h1>
 
     <div class="toc">
-      <a href="#objective">Objective</a>
-      <a href="#analytic">Analytic distance</a>
-      <a href="#newton">Newton–Raphson</a>
-      <a href="#golden">Golden section</a>
-      <a href="#compare-methods">Compare methods</a>
-      <a href="#parabola">Any parabola</a>
-      <a href="#nonpolynomial">Non-polynomial functions</a>
-      <a href="#part2">Least-squares fits</a>
-      <a href="#coord">Coordinate Newton</a>
+      <a href="#part1-analytical">P1: Analytical</a>
+      <a href="#part1-newton">P1: Newton–Raphson</a>
+      <a href="#part1-golden">P1: Golden Section</a>
+      <a href="#part1-general">P1: General Curves</a>
+      <a href="#part2-analytical">P2: Analytical Fits</a>
+      <a href="#part2-coord">P2: Coordinate Newton</a>
+      <a href="#code">Code</a>
     </div>
 
     <main class="layout">
-      <h2 id="part1">Part one · shortest distance to a function</h2>
+      <!-- PART 1 -->
+      <h2 id="part1">Part 1: Shortest Distance from a Point to a Function</h2>
 
-      <h3 id="objective">The objective</h3>
-      <p>
-        Given a point \((x_0,y_0)\) and a differentiable curve \(y=f(x)\),
-        the Euclidean distance to a point \((x,f(x))\) on the curve is
-      </p>
-      \[
-        d(x)=\sqrt{(x-x_0)^2+(f(x)-y_0)^2}.
-      \]
-      <p>
-        The square root is strictly increasing, so the minimizer of \(d\)
-        is the same as the minimizer of the squared distance
-      </p>
-      \[
-        D(x)=(x-x_0)^2+(f(x)-y_0)^2.
-      \]
-      <p>
-        Since the square root is increasing, minimizing \(D\) gives the
-        same closest point as minimizing \(d\). Once \(x^\star\) is found,
-        compute the distance as \(\sqrt{D(x^\star)}\).
-      </p>
+      <section class="problem-box">
+        <h3>Problem Formulation</h3>
+        <p>Given point $(x_0,y_0)$ and curve $y=f(x)$, minimize squared distance:</p>
+        $$D(x) = (x-x_0)^2 + (f(x)-y_0)^2$$
+        <p>Target function: $f(x) = x^2 + 5$. Query points: $(0,0), (-4,0), (-8,0), (2,0), (6,0)$.</p>
+      </section>
+
+      <h3 id="part1-analytical">1.1 Analytical Solution</h3>
+      <p>Set $D'(x) = 0$ for $f(x)=x^2+5$ and $y_0=0$:</p>
+      $$D'(x) = 2(x-x_0) + 2(x^2+5-0)(2x) = 4x^3 + 22x - 2x_0 = 0 \implies 2x^3 + 11x - x_0 = 0$$
+
+      <p><strong>Step-by-Step Solution for $(-4, 0)$:</strong></p>
+      <ol class="steps">
+        <li>Substitute $x_0 = -4$: $2x^3 + 11x - (-4) = 0 \implies 2x^3 + 11x + 4 = 0$.</li>
+        <li>Since $D''(x) = 6x^2 + 11 > 0$, the cubic is strictly increasing with exactly one real root.</li>
+        <li>Solving $2x^3 + 11x + 4 = 0$ yields $x^\star \approx -0.355470$.</li>
+        <li>Evaluate coordinate: $y^\star = f(-0.355470) = (-0.355470)^2 + 5 = 5.126359$.</li>
+        <li>Calculate distance: $d = \sqrt{(-0.355470 - (-4))^2 + (5.126359 - 0)^2} = \sqrt{(3.644530)^2 + (5.126359)^2} = 6.289845$.</li>
+      </ol>
+
+      <details>
+        <summary>Click to view step-by-step solutions for all other points: (0,0), (-8,0), (2,0), (6,0)</summary>
+        
+        <p><strong>Point $(0, 0)$:</strong></p>
+        <ol class="steps">
+          <li>Cubic: $2x^3 + 11x = 0 \implies x(2x^2 + 11) = 0 \implies x^\star = 0$.</li>
+          <li>Closest point: $(0, f(0)) = (0, 5)$.</li>
+          <li>Distance: $d = \sqrt{(0-0)^2 + (5-0)^2} = 5.000000$.</li>
+        </ol>
+
+        <p><strong>Point $(-8, 0)$:</strong></p>
+        <ol class="steps">
+          <li>Cubic: $2x^3 + 11x - (-8) = 0 \implies 2x^3 + 11x + 8 = 0 \implies x^\star \approx -0.672078$.</li>
+          <li>Closest point: $(-0.672078, (-0.672078)^2 + 5) = (-0.672078, 5.451690)$.</li>
+          <li>Distance: $d = \sqrt{(-0.672078 + 8)^2 + (5.451690 - 0)^2} = 9.133420$.</li>
+        </ol>
+
+        <p><strong>Point $(2, 0)$:</strong></p>
+        <ol class="steps">
+          <li>Cubic: $2x^3 + 11x - 2 = 0 \implies x^\star \approx 0.180745$.</li>
+          <li>Closest point: $(0.180745, (0.180745)^2 + 5) = (0.180745, 5.032669)$.</li>
+          <li>Distance: $d = \sqrt{(0.180745 - 2)^2 + (5.032669 - 0)^2} = 5.351396$.</li>
+        </ol>
+
+        <p><strong>Point $(6, 0)$:</strong></p>
+        <ol class="steps">
+          <li>Cubic: $2x^3 + 11x - 6 = 0 \implies x^\star \approx 0.519904$.</li>
+          <li>Closest point: $(0.519904, (0.519904)^2 + 5) = (0.519904, 5.270300)$.</li>
+          <li>Distance: $d = \sqrt{(0.519904 - 6)^2 + (5.270300 - 0)^2} = 7.603125$.</li>
+        </ol>
+      </details>
 
       <figure>
-        <img src="./media/p1_overview.png" alt="Parabola y=x^2+5 with five query points and shortest connecting segments" />
-        <figcaption>
-          Figure 1. Query points (circles) and their closest points
-          (squares) on \(y=x^2+5\).
-        </figcaption>
+        <img src="./media/p1_overview.png" alt="Parabola y=x^2+5 with query points" />
+        <figcaption>Figure 1. Query points and closest points on $y=x^2+5$.</figcaption>
       </figure>
 
-      <h3 id="analytic">Analytical solution</h3>
-      <p>
-        At a minimum, \(D'(x)=0\). This gives the condition that the
-        segment to the curve is perpendicular to its tangent.
-      </p>
-      \[
-        D'(x)=2(x-x_0)+2\bigl(f(x)-y_0\bigr)f'(x)=0
-        \quad\Longleftrightarrow\quad
-        (x-x_0)+\bigl(f(x)-y_0\bigr)f'(x)=0.
-      \]
-      <p>
-        For \(f(x)=x^2+5\) we have \(f'(x)=2x\). With \(y_0=0\) this
-        collapses to a depressed cubic
-      </p>
-      \[
-        2x^3 + 11x - x_0 = 0
-        \qquad\text{i.e.}\qquad
-        x^3 + \tfrac{11}{2}x - \tfrac{x_0}{2}=0.
-      \]
-      <p>
-        The cubic is strictly increasing because \(6x^2+11>0\), so it
-        has one real root. Also, \(D''(x)=12x^2+22>0\), confirming this
-        root is a minimum. Solving the cubic with a graphing calculator
-        gives the following values for each query’s \(x_0\):
-      </p>
-      \[
-        \begin{array}{c|ccccc}
-          x_0 & 0 & -4 & -8 & 2 & 6 \\
-          x^\star & 0.000000 & -0.355470 & -0.672078 & 0.180745 & 0.519904
-        \end{array}
-      \]
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Point $(x_0,y_0)$</th>
+              <th>Stationary Cubic</th>
+              <th>Root $x^\star$</th>
+              <th>Closest Point $(x^\star, y^\star)$</th>
+              <th>Distance $d$</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>(0, 0)</td><td>$2x^3+11x=0$</td><td>0.000000</td><td>(0.000, 5.000)</td><td>5.000000</td></tr>
+            <tr><td>(−4, 0)</td><td>$2x^3+11x+4=0$</td><td>−0.355470</td><td>(−0.355, 5.126)</td><td>6.289845</td></tr>
+            <tr><td>(−8, 0)</td><td>$2x^3+11x+8=0$</td><td>−0.672078</td><td>(−0.672, 5.452)</td><td>9.133420</td></tr>
+            <tr><td>(2, 0)</td><td>$2x^3+11x-2=0$</td><td>0.180745</td><td>(0.181, 5.033)</td><td>5.351396</td></tr>
+            <tr><td>(6, 0)</td><td>$2x^3+11x-6=0$</td><td>0.519904</td><td>(0.520, 5.270)</td><td>7.603125</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-      <p><strong>Worked solution for the first point, \((0,0)\).</strong></p>
+      <h3 id="part1-newton">1.2 Numerical Approach A: Newton–Raphson Method</h3>
+      <p>Root-finding on $D'(x) = 0$ using update step $x_{k+1} = x_k - \frac{D'(x_k)}{D''(x_k)}$:</p>
+      $$D'(x) = 4x^3 + 22x - 2x_0, \qquad D''(x) = 12x^2 + 22$$
+
+      <p><strong>Step-by-Step Iterations for Point $(-4, 0)$ with Initial Guess $x_0 = -2.0$:</strong></p>
       <ol class="steps">
-        <li>For query \((x_0,y_0)=(0,0)\), the stationarity equation is \(2x^3+11x-x_0=0\).</li>
-        <li>Substitute \(x_0=0\): \(2x^3+11x=0\).</li>
-        <li>Enter \(g(x)=2x^3+11x\) in a graphing calculator. Its real x-intercept is \(x=0\).</li>
-        <li>Factor the equation: \(2x^3+11x=x(2x^2+11)=0\).</li>
-        <li>Since \(2x^2+11>0\) for every real \(x\), zero is the only real root. Thus, \(x^\star=0\).</li>
-        <li>Evaluate the curve at this x-coordinate: \(y^\star=f(0)=0^2+5=5\). The closest point is \((0,5)\).</li>
-        <li>Compute the distance: \(d=\sqrt{(0-0)^2+(5-0)^2}=5\).</li>
+        <li><strong>Iteration 1:</strong> 
+          <br />$D'(-2.0) = 4(-2)^3 + 22(-2) - 2(-4) = -32 - 44 + 8 = -68$
+          <br />$D''(-2.0) = 12(-2)^2 + 22 = 48 + 22 = 70$
+          <br />$x_1 = -2.0 - \frac{-68}{70} = -1.028571$
+        </li>
+        <li><strong>Iteration 2:</strong> 
+          <br />$D'(-1.028571) = -26.974026, \quad D''(-1.028571) = 34.695510$
+          <br />$x_2 = -1.028571 - \frac{-26.974026}{34.695510} = -0.481489$
+        </li>
+        <li><strong>Iteration 3:</strong> $x_3 = -0.481489 - \frac{-3.036063}{24.782012} = -0.358849$</li>
+        <li><strong>Iteration 4:</strong> $x_4 = -0.358849 - \frac{-0.079207}{23.545190} = -0.355484$</li>
+        <li><strong>Iteration 5–6 (Convergence):</strong> $x^\star = -0.355470$.
+          <br />$y^\star = (-0.355470)^2 + 5 = 5.126359 \implies d = \sqrt{(-0.355470 + 4)^2 + (5.126359 - 0)^2} = 6.289845$.
+        </li>
       </ol>
-      <p>
-        Applying the same root calculation to each query gives:
-      </p>
 
-      <figure>
-        <img src="./media/p1_orthogonality.png" alt="Tangent at the closest point perpendicular to the connecting segment" />
-        <figcaption>
-          Figure 2. At the closest point for \((-8,0)\), the connector is
-          perpendicular to the tangent.
-        </figcaption>
-      </figure>
+      <details>
+        <summary>Click to view Newton–Raphson step-by-step for all other points</summary>
+        <p><strong>Point $(0,0)$ [Start $x_0 = 0.0$]:</strong></p>
+        <ul>
+          <li>$D'(0) = 0, D''(0) = 22 \implies x_1 = 0 - \frac{0}{22} = 0.000000$. Converged in 1 step. $d = 5.000000$.</li>
+        </ul>
 
-      <div class="table-scroll"><table>
-        <thead>
-          <tr>
-            <th>Point</th>
-            <th>Analytic \(x^\star\)</th>
-            <th>Closest \((x,f(x))\)</th>
-            <th>Distance \(d\)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>(0, 0)</td>
-            <td>0.000000</td>
-            <td>(0.000, 5.000)</td>
-            <td>5.000000</td>
-          </tr>
-          <tr>
-            <td>(−4, 0)</td>
-            <td>−0.355470</td>
-            <td>(−0.355, 5.126)</td>
-            <td>6.289845</td>
-          </tr>
-          <tr>
-            <td>(−8, 0)</td>
-            <td>−0.672078</td>
-            <td>(−0.672, 5.452)</td>
-            <td>9.133420</td>
-          </tr>
-          <tr>
-            <td>(2, 0)</td>
-            <td>0.180745</td>
-            <td>(0.181, 5.033)</td>
-            <td>5.351396</td>
-          </tr>
-          <tr>
-            <td>(6, 0)</td>
-            <td>0.519904</td>
-            <td>(0.520, 5.270)</td>
-            <td>7.603125</td>
-          </tr>
-        </tbody>
-      </table></div>
-      <h3 id="newton">Newton–Raphson on \(D'(x)=0\)</h3>
-      <p>
-        When \(f\), \(f'\), and \(f''\) are available, Newton finds a
-        root of \(D'\) using:
-      </p>
-      \[
-        x_{k+1}=x_k-\frac{D'(x_k)}{D''(x_k)},
-      \]
-      \[
-        D'(x)=2(x-x_0)+2(f(x)-y_0)f'(x),
-      \]
-      \[
-        D''(x)=2+2\bigl(f'(x)\bigr)^2+2(f(x)-y_0)f''(x).
-      \]
-      <p class="newton-worked-title"><strong>Worked solution for the first point, \((0,0)\).</strong></p>
-      <p class="newton-notation-note"><em>In the iteration below, \(x_0\) denotes Newton's initial guess for the closest point's x-coordinate, not the query point's x-coordinate.</em></p>
-      <ol class="steps">
-        <li>Set the query point to \(p=(0,0)\).</li>
-        <li>Choose the initial guess \(x_0=0\) for the closest point's x-coordinate.</li>
-        <li>For this query and the curve \(f(x)=x^2+5\), the derivatives of the squared-distance objective are \(D'(x)=4x^3+22x\) and \(D''(x)=12x^2+22\).</li>
-        <li>Evaluate them at the initial guess: \(D'(x_0)=D'(0)=0\) and \(D''(x_0)=D''(0)=22\).</li>
-        <li>Apply Newton's update: \(x_1=x_0-\frac{D'(x_0)}{D''(x_0)}=0-\frac{0}{22}=0\).</li>
-        <li>Since the update did not change the estimate, the method has converged immediately.</li>
-        <li>Evaluate the curve: \(y^\star=f(0)=0^2+5=5\), so the closest point is \((0,5)\).</li>
-        <li>Compute the distance: \(d=\sqrt{(0-0)^2+(5-0)^2}=5\).</li>
-      </ol>
-      <p>
-        For the remaining points, the initial guess is half the query’s
-        x-coordinate. Iteration stops when consecutive estimates differ
-        by less than \(10^{-12}\).
-      </p>
+        <p><strong>Point $(-8,0)$ [Start $x_0 = -4.0$]:</strong></p>
+        <ul>
+          <li>$x_1 = -4.0 - \frac{-328}{214} = -2.467290$</li>
+          <li>$x_2 = -2.467290 - \frac{-98.3752}{95.0689} = -1.432478$</li>
+          <li>$x_3 = -0.847537 \implies x_4 = -0.686036 \implies \dots \implies x^\star = -0.672078$. $d = 9.133420$.</li>
+        </ul>
 
-      <div class="table-scroll"><table>
-        <thead><tr><th>Point</th><th>Initial guess</th><th>Closest point on curve</th><th>Distance</th><th>Iterations</th></tr></thead>
-        <tbody>
-          <tr><td>(0, 0)</td><td>0.000000</td><td>(0.000000, 5.000000)</td><td>5.000000</td><td>0</td></tr>
-          <tr><td>(−4, 0)</td><td>−2.000000</td><td>(−0.355470, 5.126359)</td><td>6.289845</td><td>5</td></tr>
-          <tr><td>(−8, 0)</td><td>−4.000000</td><td>(−0.672078, 5.451690)</td><td>9.133420</td><td>7</td></tr>
-          <tr><td>(2, 0)</td><td>1.000000</td><td>(0.180745, 5.032669)</td><td>5.351396</td><td>4</td></tr>
-          <tr><td>(6, 0)</td><td>3.000000</td><td>(0.519904, 5.270300)</td><td>7.603125</td><td>6</td></tr>
-        </tbody>
-      </table></div>
+        <p><strong>Point $(2,0)$ [Start $x_0 = 1.0$]:</strong></p>
+        <ul>
+          <li>$x_1 = 1.0 - \frac{22}{34} = 0.352941$</li>
+          <li>$x_2 = 0.352941 - \frac{3.94025}{23.4948} = 0.185220 \implies \dots \implies x^\star = 0.180745$. $d = 5.351396$.</li>
+        </ul>
+
+        <p><strong>Point $(6,0)$ [Start $x_0 = 3.0$]:</strong></p>
+        <ul>
+          <li>$x_1 = 3.0 - \frac{162}{130} = 1.753846$</li>
+          <li>$x_2 = 1.753846 - \frac{48.0673}{58.9112} = 0.936288 \implies \dots \implies x^\star = 0.519904$. $d = 7.603125$.</li>
+        </ul>
+      </details>
 
       <div class="grid-2 graph-pair graph-pair-newton">
         <figure>
-          <img src="./media/p1_newton_geometry.png" alt="Newton iterates drawn as points on the parabola" />
-          <figcaption>Figure 3. Newton’s guesses for query \((-8,0)\) are shown on the curve and labelled by iteration.</figcaption>
+          <img src="./media/p1_newton_geometry.png" alt="Newton iterates on parabola" />
+          <figcaption>Figure 2. Newton–Raphson convergence trajectories on $y=x^2+5$.</figcaption>
         </figure>
         <figure>
-          <img src="./media/p1_newton_dprime.png" alt="Newton tangent steps on the D-prime graph" />
-          <figcaption>Figure 4. Newton’s steps for query \((-8,0)\) shown as tangent-line hits on \(D'(x)=0\).</figcaption>
+          <img src="./media/p1_newton_dprime.png" alt="Newton steps on D-prime curve" />
+          <figcaption>Figure 3. Root-finding iterations on $D'(x)=0$ for point $(-8,0)$.</figcaption>
         </figure>
       </div>
 
-      <h3 id="golden">Golden-section search</h3>
-      <p>
-        Golden-section search minimizes \(D(x)\) on a bracket containing
-        its minimum. It places two probes using the golden ratio
-        \(\varphi=\frac{1+\sqrt{5}}{2}\), reuses one function value per step,
-        and reduces the interval by a factor of \(\frac{1}{\varphi}\). We use
-        \([x_0-15,x_0+15]\); \(D\) is unimodal on these intervals.
-      </p>
-      <p>At each iteration, compare the squared distances at the ordered probes \(u&lt;v\):</p>
-      <ul class="steps">
-        <li>If \(D(u)&lt;D(v)\), keep the left interval \([a,v]\) and set \(b=v\).</li>
-        <li>If \(D(u)>D(v)\), keep the right interval \([u,b]\) and set \(a=u\).</li>
-        <li>If the values are equal, this implementation breaks the tie by keeping the right interval \([u,b]\) and setting \(a=u\).</li>
-      </ul>
-      <p><strong>Worked solution for the first point, \((0,0)\).</strong></p>
-      <ol class="steps">
-        <li>Choose the bracket \([a,b]=[-15,15]\) and set \(r=2-\varphi\approx0.381966\).</li>
-        <li>Place the interior probes at \(u=a+r(b-a)=-3.540738\) and \(v=b-r(b-a)=3.540738\).</li>
-        <li>Evaluate the squared distance at both probes: \(D(u)=u^2+(u^2+5)^2\) and \(D(v)=v^2+(v^2+5)^2\).</li>
-        <li>Here \(u=-v\), so symmetry gives \(D(u)=D(v)\). The minimum at \(x=0\) remains in \([u,b]\); the tie rule keeps this right interval by setting \(a=u\).</li>
-        <li>Repeat the comparison using the rules above, discard the excluded interval, and reuse the retained probe when placing the next one.</li>
-        <li>Stop when the bracket width is below \(10^{-12}\), then estimate the minimizing x-coordinate by its midpoint, \(x^\star\approx\frac{a+b}{2}=0\).</li>
-        <li>Evaluate the curve at \(x^\star=0\): the closest point is \((0,f(0))=(0,5)\).</li>
-        <li>Its distance from \((0,0)\) is \(d=\sqrt{(0-0)^2+(5-0)^2}=5\).</li>
-      </ol>
-      <figure>
-        <img src="./media/p1_golden.png" alt="Golden section shrinking intervals over D(x)" />
-        <figcaption>
-          Figure 5. Golden-section probes narrow the bracket around the
-          minimum of \(D(x)\) for query \((-8,0)\).
-        </figcaption>
-      </figure>
-      <p>
-        Results for all query points use the brackets listed below.
-      </p>
-      <div class="table-scroll"><table>
-        <thead><tr><th>Point</th><th>Bracket</th><th>Closest point on curve</th><th>Distance</th><th>Iterations</th></tr></thead>
-        <tbody>
-          <tr><td>(0, 0)</td><td>[−15, 15]</td><td>(0.000000, 5.000000)</td><td>5.000000</td><td>65</td></tr>
-          <tr><td>(−4, 0)</td><td>[−19, 11]</td><td>(−0.355470, 5.126359)</td><td>6.289845</td><td>65</td></tr>
-          <tr><td>(−8, 0)</td><td>[−23, 7]</td><td>(−0.672078, 5.451690)</td><td>9.133420</td><td>65</td></tr>
-          <tr><td>(2, 0)</td><td>[−13, 17]</td><td>(0.180745, 5.032669)</td><td>5.351396</td><td>65</td></tr>
-          <tr><td>(6, 0)</td><td>[−9, 21]</td><td>(0.519904, 5.270300)</td><td>7.603125</td><td>65</td></tr>
-        </tbody>
-      </table></div>
-      <h3 id="compare-methods">Comparing the three methods</h3>
-      <p>
-        For these query points, all three methods find the same closest
-        points to at least eight digits. They differ in what information
-        they need and how they find the minimum:
-      </p>
-      <div class="table-scroll"><table>
-        <thead>
-          <tr><th>Method</th><th>What it does</th><th>What it needs</th><th>Behavior here</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Analytical</td>
-            <td>Solves \(D'(x)=0\) for the closest x-coordinate.</td>
-            <td>An equation that can be solved for its roots.</td>
-            <td>A graphing calculator finds the single real root of the cubic for each query.</td>
-          </tr>
-          <tr>
-            <td>Newton–Raphson</td>
-            <td>Uses derivative-based updates to find a root of \(D'(x)\).</td>
-            <td>\(f\), \(f'\), \(f''\), and a starting estimate.</td>
-            <td>Converges in 4–7 updates for the nonzero query x-coordinates; the starting estimate affects convergence.</td>
-          </tr>
-          <tr>
-            <td>Golden-section search</td>
-            <td>Compares two probes and repeatedly narrows an interval around the minimum of \(D(x)\).</td>
-            <td>\(f\) and an interval containing one minimum.</td>
-            <td>Uses no derivatives; takes 65 updates here to reach tolerance \(10^{-12}\).</td>
-          </tr>
-        </tbody>
-      </table></div>
-
-      <h3 id="parabola">Any parabola</h3>
-      <p>
-        The helper accepts \(a,b,c\) for \(y=ax^2+bx+c\), then builds
-        \(f(x)=ax^2+bx+c\), \(f'(x)=2ax+b\), and \(f''(x)=2a\).
-        Newton uses these functions with a starting estimate; golden-section
-        search uses the same \(f\) and a search interval. The optimization
-        methods stay the same; only the curve parameters change.
-      </p>
-      <p>
-        The figure tests \(y=x^2\) from \((3,1)\),
-        \(y=0.5x^2-x+2\) from \((-2,4)\), and
-        \(y=-0.3x^2+4\) from \((1,-2)\). In each panel, a circle marks
-        the query point and a square marks Newton's closest point. The
-        dashed segment joins them. Newton starts at the query's
-        x-coordinate; golden-section search uses \([-8,8]\). The displayed
-        distance is Newton's result; golden-section search is also computed
-        for comparison but is not plotted here.
-      </p>
-      <figure>
-        <img src="./media/p1_other_parabolas.png" alt="Distance routine on three other parabolas" />
-        <figcaption>Figure 6. Newton closest points for three parabolas with different shapes and query points.</figcaption>
-      </figure>
-
-      <h3 id="nonpolynomial">Non-polynomial functions</h3>
-      <p>
-        The algorithms do not change; we supply a different function to each
-        routine. Newton receives \(f\), its first two derivatives, and a
-        starting estimate. Golden-section search receives \(f\) and an
-        interval. Each plot shows the function, query point, closest point,
-        and connecting segment. The table lists the inputs used and the
-        resulting closest x-coordinate and distance.
-      </p>
-      <p>For Newton, the derivative functions supplied were:</p>
-      <ul class="steps">
-        <li>\(e^x:\quad f'(x)=e^x,\quad f''(x)=e^x\)</li>
-        <li>\(\ln x:\quad f'(x)=\frac{1}{x},\quad f''(x)=-\frac{1}{x^2}\)</li>
-        <li>\(\frac{1}{x}:\quad f'(x)=-\frac{1}{x^2},\quad f''(x)=\frac{2}{x^3}\)</li>
-        <li>\(\sqrt{x}:\quad f'(x)=\frac{1}{2\sqrt{x}},\quad f''(x)=-\frac{1}{4x^{\frac{3}{2}}}\)</li>
-      </ul>
-      <figure>
-        <img src="./media/p1_nonpoly.png" alt="Distance to exponential, logarithmic, reciprocal, and square-root curves" />
-        <figcaption>
-          Figure 7. Newton and golden-section results for four
-          non-polynomial functions. For \(y=\frac{1}{x}\), the closest point to
-          \((2,2)\) is \((1,1)\), at distance \(\sqrt{2}\).
-        </figcaption>
-      </figure>
-      <figure>
-        <img src="./media/p1_newton_exp.png" alt="Newton iterates on exponential curve" />
-        <figcaption>Figure 8. Newton iterates approach the closest point on \(e^x\) to \((0,2)\).</figcaption>
-      </figure>
-      <div class="table-scroll"><table>
-        <thead>
-          <tr><th>Curve</th><th>Point</th><th>Newton start</th><th>Golden interval</th><th>Closest \(x^\star\)</th><th>Newton \(d\)</th><th>Golden \(d\)</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>\(e^x\)</td><td>(0, 2)</td><td>−1</td><td>[−3, 2]</td><td>0.524480</td><td>0.609459</td><td>0.609459</td></tr>
-          <tr><td>\(\ln x\)</td><td>(3, 0)</td><td>2</td><td>[0.2, 6]</td><td>2.632315</td><td>1.035351</td><td>1.035351</td></tr>
-          <tr><td>\(\frac{1}{x}\)</td><td>(2, 2)</td><td>1.2</td><td>[0.3, 4]</td><td>1.000000</td><td>1.414214</td><td>1.414214</td></tr>
-          <tr><td>\(\sqrt{x}\)</td><td>(2, 3)</td><td>2.5</td><td>[0.05, 6]</td><td>2.456957</td><td>1.503648</td><td>1.503648</td></tr>
-        </tbody>
-      </table></div>
-      <div class="note">
-        <strong>Choosing the search region</strong>
-        <ul>
-          <li><strong>Golden-section search:</strong> choose an interval that stays in the function's domain and contains one minimum. The intervals above meet both conditions.</li>
-          <li><strong>Newton–Raphson:</strong> the starting estimate affects which nearby stationary point it finds. If a curve has multiple minima, try several starts and compare the resulting distances.</li>
-        </ul>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Point</th><th>Start $x_0$</th><th>$x_1$</th><th>$x_2$</th><th>$x_3$</th><th>Final $x^\star$</th><th>Iterations</th><th>Distance $d$</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>(0, 0)</td><td>0.000000</td><td>0.000000</td><td>—</td><td>—</td><td>0.000000</td><td>1</td><td>5.000000</td></tr>
+            <tr><td>(−4, 0)</td><td>−2.000000</td><td>−1.028571</td><td>−0.481489</td><td>−0.358849</td><td>−0.355470</td><td>6</td><td>6.289845</td></tr>
+            <tr><td>(−8, 0)</td><td>−4.000000</td><td>−2.467290</td><td>−1.432478</td><td>−0.847537</td><td>−0.672078</td><td>8</td><td>9.133420</td></tr>
+            <tr><td>(2, 0)</td><td>1.000000</td><td>0.352941</td><td>0.185220</td><td>0.180747</td><td>0.180745</td><td>5</td><td>5.351396</td></tr>
+            <tr><td>(6, 0)</td><td>3.000000</td><td>1.753846</td><td>0.936288</td><td>0.570925</td><td>0.519904</td><td>7</td><td>7.603125</td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <h2 id="part2">Part two · fitting a line and a parabola</h2>
-      <p>
-        Fit a line \(y=mx+b\) and a parabola \(y=ax^2+bx+c\) to the four
-        data points \((0,0.5),\ (1,1.5),\ (2,3.5),\ (3,7.5)\) by
-        minimizing mean squared error (MSE):
-      </p>
-      \[
-        \mathrm{MSE}_{\text{line}}(m,b)
-        =
-        \frac{1}{n}\sum_{i=1}^{n}(y_i-mx_i-b)^2,
-      \]
-      \[
-        \mathrm{MSE}_{\text{parabola}}(a,b,c)
-        =
-        \frac{1}{n}\sum_{i=1}^{n}(y_i-ax_i^2-bx_i-c)^2.
-      \]
-      <p>
-        A residual error is the difference between an
-        observed value and the model's prediction: \(r_i=y_i-\hat{y}_i\). MSE is the average of
-        the squared residual errors, so it measures how far the fitted model's
-        predictions are from the data.
-      </p>
-      <p>
-        The data points stay fixed while we adjust the model coefficients.
-        For example, at \((2,3.5)\), the line predicts \(2m+b\), so its
-        residual error is \(3.5-(2m+b)\). The coefficients \(m\) and \(b\)
-        appear only to the first power. The parabola's residual error has
-        the same form in its coefficients:
-        \(y_i-(a x_i^2+b x_i+c)\), with each \(x_i\) fixed by the data.
-      </p>
-      <p>
-        MSE squares each residual error and averages the results. Squaring
-        creates second-power and product terms such as \(m^2\), \(mb\),
-        and \(b^2\), so MSE is a quadratic function of the coefficients.
-        For these data, each quadratic curves upward in every parameter
-        direction, like a bowl with one minimum. This strict convexity means
-        setting the first derivatives to zero gives the unique global
-        minimum, not just a possible local one.
-      </p>
-
-      <figure>
-        <img src="./media/p2_fits.png" alt="Data with fitted line and parabola" />
-        <figcaption>Figure 9. Both fitted models shown with the data points.</figcaption>
-      </figure>
-
-      <h3>Analytical line</h3>
-      <p>
-        These sums come from adding the coordinates of the four data points
-        \((0,0.5),(1,1.5),(2,3.5),(3,7.5)\):
-      </p>
-      \[
-        \begin{aligned}
-          \sum x_i &= 0+1+2+3=6,\\
-          \sum y_i &= 0.5+1.5+3.5+7.5=13,\\
-          \sum x_i^2 &= 0^2+1^2+2^2+3^2=14,\\
-          \sum x_i y_i &= 0(0.5)+1(1.5)+2(3.5)+3(7.5)=31.
-        \end{aligned}
-      \]
-      <p>
-        At the best fit, a small change to either \(m\) or \(b\) should
-        not reduce MSE. Since MSE is smooth, its slope in each parameter
-        direction must be zero there. For the line MSE, the two partial
-        derivatives are:
-      </p>
-      \[
-        \begin{aligned}
-          \frac{\partial\mathrm{MSE}}{\partial m}
-            &=-\frac{2}{4}\sum_{i=1}^{4}x_i(y_i-mx_i-b)=0,\\
-          \frac{\partial\mathrm{MSE}}{\partial b}
-            &=-\frac{2}{4}\sum_{i=1}^{4}(y_i-mx_i-b)=0.
-        \end{aligned}
-      \]
-      <p>Rearranging these zero-gradient equations gives the normal equations. Substituting the sums above:</p>
-      \[
-        \begin{aligned}
-          m\sum x_i^2+b\sum x_i=\sum x_i y_i
-            &\quad\Longrightarrow\quad 14m+6b=31,\\
-          m\sum x_i+4b=\sum y_i
-            &\quad\Longrightarrow\quad 6m+4b=13.
-        \end{aligned}
-      \]
+      <h3 id="part1-golden">1.3 Numerical Approach B: Golden Section Search</h3>
+      <p>Direct minimization of $D(x) = (x-x_0)^2 + (x^2+5-y_0)^2$ without using derivatives.</p>
+      
+      <p><strong>Step-by-Step Algorithm & Iterations for Point $(-4, 0)$:</strong></p>
       <ol class="steps">
-        <li>Using substitution and elimination on the two normal equations gives \(b=-0.2\) and \(m=2.3\), so the fitted line is \(y=2.3x-0.2\).</li>
-        <li>For \(x=0,1,2,3\), the line predicts \(-0.2,2.1,4.4,6.7\). Subtracting these from the observed values gives residual errors \(0.7,-0.6,-0.9,0.8\).</li>
-        <li>Square and add the residual errors: \(\mathrm{SSE}=0.7^2+(-0.6)^2+(-0.9)^2+0.8^2=2.3\).</li>
-        <li>Divide SSE by the four data points: \(\mathrm{MSE}=\frac{2.3}{4}=0.575\).</li>
+        <li><strong>Constants:</strong> Ratio $\varphi = \frac{1+\sqrt{5}}{2} \approx 1.618034$, $r = 2 - \varphi \approx 0.381966$. Objective: $D(x) = (x+4)^2 + (x^2+5)^2$.</li>
+        <li><strong>Initial Bracket ($k=0$):</strong> Set $[a, b] = [-19, 11]$.
+          <br />$x_1 = a + r(b-a) = -19 + 0.381966(30) = -7.541020$
+          <br />$x_2 = b - r(b-a) = 11 - 0.381966(30) = 2.917961$
+        </li>
+        <li><strong>Evaluate Probes:</strong>
+          <br />$D(x_1) = (-7.541020+4)^2 + ((-7.541020)^2+5)^2 = 12.5388 + 3827.6010 = 3840.1398$
+          <br />$D(x_2) = (2.917961+4)^2 + ((2.917961)^2+5)^2 = 47.8582 + 182.6373 = 230.4955$
+        </li>
+        <li><strong>Update Rule:</strong> Since $D(x_1) > D(x_2)$, the minimum lies in $[x_1, b]$.
+          <br />Set $a = x_1 = -7.541020$, retain $x_{1,\text{new}} = x_2 = 2.917961$, recompute $x_{2,\text{new}} = b - r(b-a) = 3.917961$.
+        </li>
+        <li><strong>Iteration 2 ($k=1$):</strong> New bracket $[-7.541020, 11]$. Compare $D(2.917961)$ and $D(3.917961)$. $D(2.917961) < D(3.917961)$, so set $b = 3.917961$.</li>
+        <li><strong>Convergence ($k=65$):</strong> Bracket shrinks until $|b - a| < 10^{-12}$.
+          <br />$x^\star = \frac{a+b}{2} \approx -0.355469673$.
+          <br />$d = \sqrt{D(x^\star)} = 6.289845$.
+        </li>
       </ol>
 
-      <h3>Analytical parabola</h3>
-      <p>
-        Using the same four data points, the additional sums are:
-      </p>
-      \[
-        \begin{aligned}
-          \sum x_i^3 &= 0^3+1^3+2^3+3^3=36,\\
-          \sum x_i^4 &= 0^4+1^4+2^4+3^4=98,\\
-          \sum x_i^2y_i &= 0^2(0.5)+1^2(1.5)+2^2(3.5)+3^2(7.5)=83.
-        \end{aligned}
-      \]
-      <p>
-        Setting the partial derivatives of the parabola MSE to zero gives
-        these normal equations:
-      </p>
-      \[
-        \begin{aligned}
-          98a+36b+14c &= 83,\\
-          36a+14b+6c &= 31,\\
-          14a+6b+4c &= 13.
-        \end{aligned}
-      \]
-      <ol class="steps">
-        <li>Using elimination on the three normal equations gives \(a=0.75\), \(b=0.05\), and \(c=0.55\), so the fitted parabola is \(y=0.75x^2+0.05x+0.55\).</li>
-        <li>For \(x=0,1,2,3\), the model predicts \(0.55,1.35,3.65,7.45\). The residual errors are observed minus predicted: \(-0.05,0.15,-0.15,0.05\).</li>
-        <li>Square and add the residual errors: \(\mathrm{SSE}=(-0.05)^2+0.15^2+(-0.15)^2+0.05^2=0.05\).</li>
-        <li>Divide SSE by the four data points: \(\mathrm{MSE}=\frac{0.05}{4}=0.0125\).</li>
-      </ol>
+      <details>
+        <summary>Click to view Golden Section Search step-by-step brackets for all other points</summary>
+        <p><strong>Point $(0, 0)$ [Initial $[a,b] = [-15, 15]$]:</strong></p>
+        <ul>
+          <li>$k=0$: Probes $x_1 = -3.541020, x_2 = 3.541020$. $D(x_1) = D(x_2) = 321.328$. Tie rule sets $a = -3.541020$.</li>
+          <li>$k=1$: Bracket $[-3.541020, 15]$. $k=65$: $x^\star = 0.000000021 \implies d = 5.000000$.</li>
+        </ul>
+
+        <p><strong>Point $(-8, 0)$ [Initial $[a,b] = [-23, 7]$]:</strong></p>
+        <ul>
+          <li>$k=0$: Probes $x_1 = -11.541020, x_2 = -4.458980$. $D(x_1) = 19131.2, D(x_2) = 630.9$. $D(x_1) > D(x_2) \implies a = -11.541020$.</li>
+          <li>$k=65$: $x^\star = -0.672078105 \implies d = 9.133420$.</li>
+        </ul>
+
+        <p><strong>Point $(2, 0)$ [Initial $[a,b] = [-13, 17]$]:</strong></p>
+        <ul>
+          <li>$k=0$: Probes $x_1 = -1.541020, x_2 = 5.541020$. $D(x_1) = 66.82, D(x_2) = 1290.41$. $D(x_1) < D(x_2) \implies b = 5.541020$.</li>
+          <li>$k=65$: $x^\star = 0.180744623 \implies d = 5.351396$.</li>
+        </ul>
+
+        <p><strong>Point $(6, 0)$ [Initial $[a,b] = [-9, 21]$]:</strong></p>
+        <ul>
+          <li>$k=0$: Probes $x_1 = 2.458980, x_2 = 9.541020$. $D(x_1) = 134.81, D(x_2) = 9226.71$. $D(x_1) < D(x_2) \implies b = 9.541020$.</li>
+          <li>$k=65$: $x^\star = 0.519903662 \implies d = 7.603125$.</li>
+        </ul>
+      </details>
+
       <figure>
-        <img src="./media/p2_residuals.png" alt="Residual error stem plots for line and parabola" />
-        <figcaption>Figure 10. Residual errors for the line and parabola fits.</figcaption>
+        <img src="./media/p1_golden.png" alt="Golden section search intervals" />
+        <figcaption>Figure 4. Interval reduction progression for Golden Section Search on query $(-8,0)$.</figcaption>
       </figure>
 
-      <section class="fit-summary" aria-labelledby="fit-summary-title">
-        <h3 id="fit-summary-title">Summary of Results</h3>
-        <ul class="fit-results">
-          <li>For the line, the MSE is \(0.575\).</li>
-          <li>For the best-fit line, the equation is \(y=2.3x-0.2\).</li>
-          <li>For the parabola, the MSE is \(0.0125\).</li>
-          <li>For the best-fit parabola, the equation is \(y=0.75x^2+0.05x+0.55\).</li>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Point</th><th>Initial Bracket $[a, b]$</th><th>Final $x^\star$</th><th>Distance $d$</th><th>Evaluations</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>(0, 0)</td><td>[−15, 15]</td><td>0.000000021</td><td>5.000000</td><td>65</td></tr>
+            <tr><td>(−4, 0)</td><td>[−19, 11]</td><td>−0.355469673</td><td>6.289845</td><td>65</td></tr>
+            <tr><td>(−8, 0)</td><td>[−23, 7]</td><td>−0.672078105</td><td>9.133420</td><td>65</td></tr>
+            <tr><td>(2, 0)</td><td>[−13, 17]</td><td>0.180744623</td><td>5.351396</td><td>65</td></tr>
+            <tr><td>(6, 0)</td><td>[−9, 21]</td><td>0.519903662</td><td>7.603125</td><td>65</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="part1-general">1.4 Arbitrary & Non-Polynomial Functions</h3>
+      <p>Extending numerical procedures to arbitrary curves $y=f(x)$:</p>
+
+      <div class="grid-2 graph-pair">
+        <figure>
+          <img src="./media/p1_other_parabolas.png" alt="Other parabolas solutions" />
+          <figcaption>Figure 5. Distance solutions for alternate parabola parameters.</figcaption>
+        </figure>
+        <figure>
+          <img src="./media/p1_nonpoly.png" alt="Non-polynomial curves solutions" />
+          <figcaption>Figure 6. Distance minimization for exponential, log, rational, and radical curves.</figcaption>
+        </figure>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Function $f(x)$</th><th>Query $(x_0,y_0)$</th><th>Derivatives Used ($f', f''$)</th><th>Closest $x^\star$</th><th>Min Distance $d$</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>$e^x$</td><td>(0, 2)</td><td>$f'=e^x, f''=e^x$</td><td>0.524480</td><td>0.609459</td></tr>
+            <tr><td>$\ln x$</td><td>(3, 0)</td><td>$f'=1/x, f''=-1/x^2$</td><td>2.632315</td><td>1.035351</td></tr>
+            <tr><td>$1/x$</td><td>(2, 2)</td><td>$f'=-1/x^2, f''=2/x^3$</td><td>1.000000</td><td>1.414214</td></tr>
+            <tr><td>$\sqrt{x}$</td><td>(2, 3)</td><td>$f'=1/(2\sqrt{x}), f''=-1/(4x^{3/2})$</td><td>2.456957</td><td>1.503648</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PART 2 -->
+      <h2 id="part2">Part 2: Function Fitting by Minimizing MSE</h2>
+
+      <section class="problem-box">
+        <h3>Problem Formulation</h3>
+        <p>Fit models to dataset: $(0, 0.5), (1, 1.5), (2, 3.5), (3, 7.5)$.</p>
+        $$\mathrm{MSE}_{\text{line}}(m,b) = \frac{1}{4}\sum_{i=1}^4 (y_i - (mx_i + b))^2$$
+        $$\mathrm{MSE}_{\text{parabola}}(a,b,c) = \frac{1}{4}\sum_{i=1}^4 (y_i - (ax_i^2 + bx_i + c))^2$$
+      </section>
+
+      <h3 id="part2-analytical">2.1 Analytical Normal Equations Solution</h3>
+      <p>To find the optimal parameters analytically, we derive the normal equations by taking partial derivatives of the Mean Squared Error ($\mathrm{MSE}$) with respect to each parameter and setting them equal to zero.</p>
+
+      <p><strong>1. Summary Statistics of the Dataset ($N=4$):</strong></p>
+      $$\begin{aligned}
+      \sum x_i &= 0 + 1 + 2 + 3 = 6 \\
+      \sum y_i &= 0.5 + 1.5 + 3.5 + 7.5 = 13 \\
+      \sum x_i^2 &= 0^2 + 1^2 + 2^2 + 3^2 = 0 + 1 + 4 + 9 = 14 \\
+      \sum x_i^3 &= 0^3 + 1^3 + 2^3 + 3^3 = 0 + 1 + 8 + 27 = 36 \\
+      \sum x_i^4 &= 0^4 + 1^4 + 2^4 + 3^4 = 0 + 1 + 16 + 81 = 98 \\
+      \sum x_i y_i &= (0)(0.5) + (1)(1.5) + (2)(3.5) + (3)(7.5) = 0 + 1.5 + 7.0 + 22.5 = 31 \\
+      \sum x_i^2 y_i &= (0^2)(0.5) + (1^2)(1.5) + (2^2)(3.5) + (3^2)(7.5) = 0 + 1.5 + 14.0 + 67.5 = 83
+      \end{aligned}$$
+
+      <p><strong>Step-by-Step Solution for Linear Model ($y = mx + b$):</strong></p>
+      <ol class="steps">
+        <li><strong>Derive Equations from Partial Derivatives:</strong>
+          <br />Setting $\frac{\partial \mathrm{MSE}}{\partial m} = 0$ and $\frac{\partial \mathrm{MSE}}{\partial b} = 0$ yields the system of 2 linear equations:
+          $$\begin{cases}
+          m \sum x_i^2 + b \sum x_i = \sum x_i y_i \\
+          m \sum x_i + b N = \sum y_i
+          \end{cases}$$
+        </li>
+        <li><strong>Substitute Known Summations:</strong>
+          $$\begin{cases}
+          14m + 6b = 31 & \text{--- (Eq. 1)} \\
+          6m + 4b = 13 & \text{--- (Eq. 2)}
+          \end{cases}$$
+        </li>
+        <li><strong>Solve System via Substitution / Elimination:</strong>
+          <br />From Eq. 2, express $b$ in terms of $m$:
+          $$4b = 13 - 6m \implies b = 3.25 - 1.5m$$
+          Substitute $b$ into Eq. 1:
+          $$14m + 6(3.25 - 1.5m) = 31$$
+          $$14m + 19.5 - 9m = 31$$
+          $$5m = 11.5 \implies \mathbf{m = 2.3}$$
+          Solve for $b$:
+          $$b = 3.25 - 1.5(2.3) = 3.25 - 3.45 = \mathbf{-0.2}$$
+          Optimal linear model: $\mathbf{y = 2.3x - 0.2}$.
+        </li>
+        <li><strong>Compute Residuals and Minimum MSE:</strong>
+          <br />Predictions $\hat{y}_i = 2.3x_i - 0.2 \implies \hat{\mathbf{y}} = [-0.2, 2.1, 4.4, 6.7]$.
+          <br />Residuals $(y_i - \hat{y}_i) = [0.7, -0.6, -0.9, 0.8]$.
+          <br />$$\mathrm{MSE}_{\text{line}} = \frac{1}{4}\left((0.7)^2 + (-0.6)^2 + (-0.9)^2 + (0.8)^2\right) = \frac{0.49 + 0.36 + 0.81 + 0.64}{4} = \mathbf{0.5750}$$
+        </li>
+      </ol>
+
+      <p><strong>Step-by-Step Solution for Parabolic Model ($y = ax^2 + bx + c$):</strong></p>
+      <ol class="steps">
+        <li><strong>Derive System of Normal Equations:</strong>
+          <br />Setting $\frac{\partial \mathrm{MSE}}{\partial a} = 0$, $\frac{\partial \mathrm{MSE}}{\partial b} = 0$, and $\frac{\partial \mathrm{MSE}}{\partial c} = 0$ yields 3 simultaneous equations:
+          $$\begin{cases}
+          a \sum x_i^4 + b \sum x_i^3 + c \sum x_i^2 = \sum x_i^2 y_i \\
+          a \sum x_i^3 + b \sum x_i^2 + c \sum x_i = \sum x_i y_i \\
+          a \sum x_i^2 + b \sum x_i + c N = \sum y_i
+          \end{cases}$$
+        </li>
+        <li><strong>Substitute Known Summations:</strong>
+          $$\begin{cases}
+          98a + 36b + 14c = 83 & \text{--- (Eq. 1)} \\
+          36a + 14b + 6c = 31 & \text{--- (Eq. 2)} \\
+          14a + 6b + 4c = 13 & \text{--- (Eq. 3)}
+          \end{cases}$$
+        </li>
+        <li><strong>Algebraic Elimination:</strong>
+          <br />Multiply Eq. 3 by 1.5 to align $c$ coefficients:
+          $$21a + 9b + 6c = 19.5 \quad \text{--- (Eq. 3b)}$$
+          Subtract Eq. 3b from Eq. 2 to eliminate $c$:
+          $$(36a - 21a) + (14b - 9b) = 31 - 19.5 \implies 15a + 5b = 11.5 \quad \text{--- (Eq. 4)}$$
+          Multiply Eq. 3 by 3.5 to align $c$ coefficients with Eq. 1:
+          $$49a + 21b + 14c = 45.5 \quad \text{--- (Eq. 3c)}$$
+          Subtract Eq. 3c from Eq. 1 to eliminate $c$:
+          $$(98a - 49a) + (36b - 21b) = 83 - 45.5 \implies 49a + 15b = 37.5 \quad \text{--- (Eq. 5)}$$
+          Multiply Eq. 4 by 3:
+          $$45a + 15b = 34.5 \quad \text{--- (Eq. 4b)}$$
+          Subtract Eq. 4b from Eq. 5 to solve for $a$:
+          $$4a = 3.0 \implies \mathbf{a = 0.75}$$
+          Substitute $a = 0.75$ back into Eq. 4:
+          $$15(0.75) + 5b = 11.5 \implies 11.25 + 5b = 11.5 \implies 5b = 0.25 \implies \mathbf{b = 0.05}$$
+          Substitute $a = 0.75$ and $b = 0.05$ into Eq. 3:
+          $$14(0.75) + 6(0.05) + 4c = 13 \implies 10.5 + 0.3 + 4c = 13 \implies 4c = 2.2 \implies \mathbf{c = 0.55}$$
+          Optimal parabolic model: $\mathbf{y = 0.75x^2 + 0.05x + 0.55}$.
+        </li>
+        <li><strong>Compute Residuals and Minimum MSE:</strong>
+          <br />Predictions $\hat{y}_i = 0.75x_i^2 + 0.05x_i + 0.55 \implies \hat{\mathbf{y}} = [0.55, 1.35, 3.65, 7.45]$.
+          <br />Residuals $(y_i - \hat{y}_i) = [-0.05, 0.15, -0.15, 0.05]$.
+          <br />$$\mathrm{MSE}_{\text{parabola}} = \frac{1}{4}\left((-0.05)^2 + (0.15)^2 + (-0.15)^2 + (0.05)^2\right) = \frac{0.0025 + 0.0225 + 0.0225 + 0.0025}{4} = \mathbf{0.0125}$$
+        </li>
+      </ol>
+
+      <figure>
+        <img src="./media/p2_fits.png" alt="Fitted line and parabola curves" />
+        <figcaption>Figure 7. Analytical optimal fits for linear and parabolic models against data points.</figcaption>
+      </figure>
+
+      <h3 id="part2-coord">2.2 Coordinate-Wise Newton–Raphson Method</h3>
+      <p>Alternating single-parameter updates: $\theta_{k+1} = \theta_k - \frac{\partial \mathrm{MSE} / \partial \theta}{\partial^2 \mathrm{MSE} / \partial \theta^2}$.</p>
+
+      <div class="grid-2 graph-pair">
+        <figure>
+          <img src="./media/p2_line_contour.png" alt="MSE contour plot line search" />
+          <figcaption>Figure 8. Coordinate-descent path on linear MSE loss surface towards $(2.3, -0.2)$.</figcaption>
+        </figure>
+        <figure>
+          <img src="./media/p2_line_steps.png" alt="Line fit updates" />
+          <figcaption>Figure 9. Progressive convergence of fitted line per coordinate step.</figcaption>
+        </figure>
+      </div>
+
+      <p><strong>Linear Optimization Steps (Initial Start $m_0=0, b_0=0$):</strong></p>
+      <ol class="steps">
+        <li>Step 1 (Update $m$): $\frac{\partial \text{MSE}}{\partial m} = -15.5, \; \frac{\partial^2 \text{MSE}}{\partial m^2} = 7 \implies m_1 = 0 - \frac{-15.5}{7} = 2.214286 \quad (\text{MSE} = 0.589286)$</li>
+        <li>Step 2 (Update $b$): $\frac{\partial \text{MSE}}{\partial b} = 0.142857, \; \frac{\partial^2 \text{MSE}}{\partial b^2} = 2 \implies b_1 = 0 - \frac{0.142857}{2} = -0.071429 \quad (\text{MSE} = 0.584184)$</li>
+        <li>Subsequent iterations alternate $m \to b$ converging to $(2.3, -0.2)$.</li>
+      </ol>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Step</th><th>Updated Param</th><th>$m$</th><th>$b$</th><th>Current MSE</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td>Initialization</td><td>0.000000</td><td>0.000000</td><td>17.750000</td></tr>
+            <tr><td>1</td><td>$m$</td><td>2.214286</td><td>0.000000</td><td>0.589286</td></tr>
+            <tr><td>2</td><td>$b$</td><td>2.214286</td><td>−0.071429</td><td>0.584184</td></tr>
+            <tr><td>3</td><td>$m$</td><td>2.244898</td><td>−0.071429</td><td>0.580904</td></tr>
+            <tr><td>4</td><td>$b$</td><td>2.244898</td><td>−0.117347</td><td>0.578795</td></tr>
+            <tr><td>Analytical</td><td>Exact</td><td>2.300000</td><td>−0.200000</td><td>0.575000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2 graph-pair">
+        <figure>
+          <img src="./media/p2_parabola_steps.png" alt="Parabola fit updates" />
+          <figcaption>Figure 10. Sequential parabolic fits during coordinate updates ($a \to b \to c$).</figcaption>
+        </figure>
+        <figure>
+          <img src="./media/p2_mse_history.png" alt="MSE convergence rate graph" />
+          <figcaption>Figure 11. MSE reduction history for linear and parabolic coordinate updates.</figcaption>
+        </figure>
+      </div>
+
+      <section class="problem-box">
+        <h3>Final Results Summary</h3>
+        <ul>
+          <li><strong>Optimal Linear Model:</strong> $y = 2.3x - 0.2$ | <strong>Optimal MSE:</strong> $0.5750$</li>
+          <li><strong>Optimal Parabolic Model:</strong> $y = 0.75x^2 + 0.05x + 0.55$ | <strong>Optimal MSE:</strong> $0.0125$</li>
         </ul>
       </section>
 
-      <h3 id="coord">Coordinate-wise Newton–Raphson</h3>
-      <p>
-        Instead of updating all coefficients at once, coordinate-wise
-        Newton updates one coefficient while holding the others fixed.
-        For each coefficient \(\theta\), use the one-variable Newton
-        update \(\theta\leftarrow\theta-\frac{\partial\mathrm{MSE}/\partial\theta}{\partial^2\mathrm{MSE}/\partial\theta^2}\),
-        then move to the next coefficient and repeat the cycle.
-      </p>
-      <p><strong>Line fit: update \(m\), then \(b\).</strong> Let \(r_i=y_i-mx_i-b\) be each residual error. First hold \(b\) fixed and update the slope:</p>
-      \[
-        \frac{\partial\mathrm{MSE}}{\partial m}
-        =
-        -\frac{2}{n}\sum x_i(y_i-mx_i-b),
-        \qquad
-        \frac{\partial^2\mathrm{MSE}}{\partial m^2}
-        =
-        \frac{2}{n}\sum x_i^2,
-      \]
-      <p>
-        Then hold the updated \(m\) fixed and update the intercept \(b\).
-        Each one-variable MSE is quadratic, so its Newton step reaches the
-        minimum along that coordinate exactly.
-      </p>
-      \[
-        \frac{\partial\mathrm{MSE}}{\partial b}=-\frac{2}{n}\sum r_i,
-        \qquad
-        \frac{\partial^2\mathrm{MSE}}{\partial b^2}=2.
-      \]
-      <p><strong>First cycle, starting from \((m,b)=(0,0)\).</strong></p>
-      <ol class="steps">
-        <li>Use the data points \((0,0.5),(1,1.5),(2,3.5),(3,7.5)\), in this order. With \(m=b=0\), the line predicts zero at each x-value, so the residual errors are \((0.5,1.5,3.5,7.5)\).</li>
-        <li>For the slope update, calculate the gradient: \(\frac{\partial\mathrm{MSE}}{\partial m}=-\frac{2}{4}[0(0.5)+1(1.5)+2(3.5)+3(7.5)]=-15.5\).</li>
-        <li>The second derivative for the slope is \(\frac{\partial^2\mathrm{MSE}}{\partial m^2}=7\).</li>
-        <li>Apply the Newton update: \(m=0-\frac{-15.5}{7}=2.214286\).</li>
-        <li>With this slope update, MSE decreases to \(0.589286\).</li>
-        <li>Keep the new slope fixed and recompute the residual errors: \((0.5,-0.714286,-0.928571,0.857143)\).</li>
-        <li>For the intercept update, the gradient is \(\frac{\partial\mathrm{MSE}}{\partial b}=0.142857\).</li>
-        <li>The second derivative for the intercept is \(\frac{\partial^2\mathrm{MSE}}{\partial b^2}=2\).</li>
-        <li>Apply the Newton update: \(b=0-\frac{0.142857}{2}=-0.071429\).</li>
-        <li>The completed cycle gives \((m,b)=(2.214286,-0.071429)\) and MSE \(0.584184\). The table shows later cycles.</li>
-      </ol>
-
-      <div class="table-scroll"><table>
-        <thead>
-          <tr><th>Step</th><th>Updated</th><th>\(m\)</th><th>\(b\)</th><th>MSE</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>0</td><td>—</td><td>0.000000</td><td>0.000000</td><td>17.750000</td></tr>
-          <tr><td>1</td><td>\(m\)</td><td>2.214286</td><td>0.000000</td><td>0.589286</td></tr>
-          <tr><td>2</td><td>\(b\)</td><td>2.214286</td><td>−0.071429</td><td>0.584184</td></tr>
-          <tr><td>3</td><td>\(m\)</td><td>2.244898</td><td>−0.071429</td><td>0.580904</td></tr>
-          <tr><td>4</td><td>\(b\)</td><td>2.244898</td><td>−0.117347</td><td>0.578795</td></tr>
-          <tr><td>12</td><td>\(b\)</td><td>2.290589</td><td>−0.185884</td><td>0.575111</td></tr>
-          <tr><td>∞</td><td>analytic</td><td>2.300000</td><td>−0.200000</td><td>0.575000</td></tr>
-        </tbody>
-      </table></div>
-
-      <div class="grid-2 graph-pair graph-pair-line">
-        <figure>
-          <img src="./media/p2_line_contour.png" alt="MSE contours in m-b plane with Newton path" />
-          <figcaption>Figure 11. Each contour connects slope–intercept pairs with the same MSE. Numbered points trace the coordinate-Newton updates, alternating between \(m\) and \(b\), from \((0,0)\) toward the star marking the analytical minimum \((2.3,-0.2)\).</figcaption>
-        </figure>
-        <figure>
-          <img src="./media/p2_line_steps.png" alt="Intermediate fitted lines" />
-          <figcaption>Figure 12. Black points are the data; colored lines show \(y=mx+b\) after updates 0–4. The method alternates between changing the slope and intercept, moving the line toward the best fit. The legend gives each step's MSE.</figcaption>
-        </figure>
-      </div>
-
-      <p><strong>Parabola fit: update \(a\), then \(b\), then \(c\).</strong> For \(r_i=y_i-(ax_i^2+bx_i+c)\), the coordinate derivatives are:</p>
-      \[
-        \begin{aligned}
-          \frac{\partial\mathrm{MSE}}{\partial a}&=-\frac{2}{n}\sum x_i^2r_i,&
-          \frac{\partial^2\mathrm{MSE}}{\partial a^2}&=\frac{2}{n}\sum x_i^4,\\
-          \frac{\partial\mathrm{MSE}}{\partial b}&=-\frac{2}{n}\sum x_ir_i,&
-          \frac{\partial^2\mathrm{MSE}}{\partial b^2}&=\frac{2}{n}\sum x_i^2,\\
-          \frac{\partial\mathrm{MSE}}{\partial c}&=-\frac{2}{n}\sum r_i,&
-          \frac{\partial^2\mathrm{MSE}}{\partial c^2}&=2.
-        \end{aligned}
-      \]
-      <p><strong>First cycle, starting from \((a,b,c)=(0,0,0)\).</strong></p>
-      <ol class="steps">
-        <li>Start at \((a,b,c)=(0,0,0)\). The initial MSE is \(17.75\).</li>
-        <li>Hold \(b=c=0\). At this start, the residual errors equal the observed y-values, and \(\sum x_i^2r_i=83\).</li>
-        <li>The gradient for \(a\) is \(\frac{\partial\mathrm{MSE}}{\partial a}=-\frac{2}{4}(83)=-41.5\).</li>
-        <li>The second derivative for \(a\) is \(\frac{\partial^2\mathrm{MSE}}{\partial a^2}=\frac{2}{4}(98)=49\).</li>
-        <li>Apply the Newton update: \(a=0-\frac{-41.5}{49}=0.846939\).</li>
-        <li>MSE decreases to \(0.176020\).</li>
-        <li>Keep \(a\) fixed and recompute the residual errors: \((0.5,0.653061,0.112245,-0.122449)\).</li>
-        <li>Using these residual errors, the gradient for \(b\) is \(-0.255102\).</li>
-        <li>The second derivative for \(b\) is \(\frac{2}{4}\sum x_i^2=7\).</li>
-        <li>Apply the Newton update: \(b=0-\frac{-0.255102}{7}=0.036443\).</li>
-        <li>MSE decreases to \(0.171372\).</li>
-        <li>Keep \(a\) and \(b\) fixed, then recompute the residual errors: \((0.5,0.616618,0.039359,-0.231778)\).</li>
-        <li>Using these residual errors, the gradient for \(c\) is approximately \(-0.462099\).</li>
-        <li>The second derivative for \(c\) is \(2\).</li>
-        <li>Apply the Newton update: \(c=0-\frac{-0.462099}{2}=0.231050\).</li>
-        <li>The completed cycle gives MSE \(0.117988\).</li>
-        <li>Repeat the cycle \(a\to b\to c\). The coefficients converge to \((0.75,0.05,0.55)\), the analytical solution, and MSE converges to \(0.0125\).</li>
-      </ol>
-
-      <div class="grid-2 graph-pair graph-pair-parabola">
-        <figure>
-          <img src="./media/p2_parabola_steps.png" alt="Intermediate fitted parabolas" />
-          <figcaption>Figure 13. Parabola fits at selected coordinate updates.</figcaption>
-        </figure>
-        <figure>
-          <img src="./media/p2_mse_history.png" alt="MSE versus iteration for line and parabola" />
-          <figcaption>Figure 14. MSE decreases over coordinate-Newton updates (log scale).</figcaption>
-        </figure>
-      </div>
-
-      <h2 id="code">Code</h2>
-      <p>
-        The assignment code is organized by task:
-      </p>
+      <!-- CODE ROUTINES -->
+      <h2 id="code">Code Implementations</h2>
       <ul class="code-files">
-        <li><a href="./code/distance.py">distance.py</a> contains the squared-distance helper, Newton–Raphson and golden-section solvers, and a wrapper for parabolas. It also runs the assignment examples and non-polynomial smoke tests.</li>
-        <li><a href="./code/fitting.py">fitting.py</a> defines the data and MSE functions, solves the line and parabola fits analytically, and records coordinate-wise Newton updates.</li>
-        <li><a href="./code/generate_figures.py">generate_figures.py</a> runs the examples and creates the plots saved in the <code>media</code> folder.</li>
+        <li><a href="./code/distance.py">distance.py</a> — Optimization algorithms (Newton-Raphson & Golden Section) for point-to-curve distance.</li>
+        <li><a href="./code/fitting.py">fitting.py</a> — Analytical linear system solvers and coordinate-wise Newton optimizer for MSE.</li>
+        <li><a href="./code/generate_figures.py">generate_figures.py</a> — Plotting script generating step visualizations.</li>
       </ul>
     </main>
 
     <footer>
-      Mira Suthakar · SYDE 572 · Assignment 1 ·
-      <a href="../">home</a>
+      Mira Suthakar · SYDE 572 · Assignment 1
     </footer>
   </div>
 
